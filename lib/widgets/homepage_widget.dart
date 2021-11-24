@@ -2,22 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key, required this.appBarTitle}) : super(key: key);
-  final String appBarTitle;
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return buildHomePage(context, appBarTitle);
+    return buildHomePage(context);
   }
 }
 
-Widget buildHomePage(BuildContext context, String appBarTitle) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text(appBarTitle),
-    ),
-    body: const RandomWords(),
-  );
+Widget buildHomePage(BuildContext context) {
+  return const RandomWords();
 }
 
 class RandomWords extends StatefulWidget {
@@ -33,7 +27,40 @@ class _RandomWordsState extends State<RandomWords> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildSuggestions();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Nicknames Generator"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.list),
+            onPressed: _pushSaved,
+            tooltip: "Saved nicknames",
+          )
+        ],
+      ),
+      body: _buildSuggestions(),
+    );
+  }
+
+  void _pushSaved() {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (context) {
+      final tiles = _favoritedNicks.map((pair) {
+        return _buildRow(pair);
+      });
+
+      final divided = tiles.isNotEmpty
+          ? ListTile.divideTiles(context: context, tiles: tiles).toList()
+          : <Widget>[];
+
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Saved Nicknames"),
+        ),
+        body: ListView(
+          children: divided,
+        ),
+      );
+    }));
   }
 
   Widget _buildSuggestions() {
